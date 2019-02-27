@@ -1,0 +1,15 @@
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\TestClient.exe.config
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\TestClient.exe
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\TestClient.pdb
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\Json.dll
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\Newtonsoft.Json.dll
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\System.Net.Http.Formatting.dll
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\Json.pdb
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\Newtonsoft.Json.xml
+C:\Users\patri\source\repos\TestClient\TestClient\bin\Debug\System.Net.Http.Formatting.xml
+C:\Users\patri\source\repos\TestClient\TestClient\obj\Debug\TestClient.csprojAssemblyReference.cache
+C:\Users\patri\source\repos\TestClient\TestClient\obj\Debug\TestClient.csproj.CoreCompileInputs.cache
+C:\Users\patri\source\repos\TestClient\TestClient\obj\Debug\TestClient.csproj.CopyComplete
+C:\Users\patri\source\repos\TestClient\TestClient\obj\Debug\TestClient.exe
+C:\Users\patri\source\repos\TestClient\TestClient\obj\Debug\TestClient.pdb
