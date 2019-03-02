@@ -8,14 +8,6 @@ using System.Collections.Generic;
 
 namespace HttpClientSample
 {
-    public class Product
-    {
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public string Category { get; set; }
-    }
-
     class Program
     {
         static HttpClient client = new HttpClient();
@@ -49,35 +41,62 @@ namespace HttpClientSample
             response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.
+           
             return response.Headers.Location;
         }
 
-        static async Task<List<User>> GetProductAsync(string path)
+        static async Task<OutLogin> Login(Login login)
         {
-            List<User> product = null;
+            string sendEmail = Crypto.Encrypt(login.Email, passPhrase);
+            string sendPassword = Crypto.Encrypt(login.Password, passPhrase);
+            Login logSend = new Login() {
+                Email = sendEmail,
+                Password = sendPassword
+            };
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/login", logSend);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            User tempUser = await GetProductAsync(tempURL.ToString());
+            string id = tempUser.Id;
+            string email = Crypto.Decrypt(tempUser.Email, passPhrase);
+            OutLogin final = new OutLogin() {
+                Email = email,
+                Id = id
+            };
+            return final;
+            //OutLogin temp = response.Content.ReadAsAsync<OutLogin>();
+
+        }
+
+        static async Task<User> GetProductAsync(string path)
+        {
+            User product = null;
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode)
             {
-                product = await response.Content.ReadAsAsync<List<User>>();
+                product = await response.Content.ReadAsAsync<User>();
             }
             return product;
         }
 
-        static async Task<Product> UpdateProductAsync(Product product)
+        static async Task<User> UpdateProductAsync(User user)
         {
             HttpResponseMessage response = await client.PutAsJsonAsync(
-                $"api/products/{product.Id}", product);
+                $"https://localhost:44389/api/1.0/user/{ user.Id}", user);
             response.EnsureSuccessStatusCode();
 
             // Deserialize the updated product from the response body.
-            product = await response.Content.ReadAsAsync<Product>();
-            return product;
+            user = await response.Content.ReadAsAsync<User>();
+            return user;
         }
 
         static async Task<HttpStatusCode> DeleteProductAsync(string id)
         {
             HttpResponseMessage response = await client.DeleteAsync(
-                $"api/products/{id}");
+                $"https://localhost:44389/api/1.0/user/{id}");
             return response.StatusCode;
         }
 
@@ -107,36 +126,43 @@ namespace HttpClientSample
                 //var url = await CreateProductAsync(product);
                 //Console.WriteLine($"Created at {url}");
                 var url = "https://localhost:44389/api/1.0/user";
+                Login login = new Login()
+                {
+                    Email = "john@random.com",
+                    Password = "password"
+                };
+                var res = await Login(login);
+                Console.WriteLine(res.Email);
                 // Get the product
                 //url.PathAndQuery
                 
-                 User usering = new User
-                {
-                    FirstName = "John",
-                    LastName = "Doe",
-                    DOB = "02/02/2002",
-                    Posistion = "Observer",
-                    Address = "123 milll lane",
-                    PostCode = "CV1 2KS",
-                    Email = "john@random.com",
-                    PhoneNumber = "123456789",
-                    MobilePhoneNumber = "98745612332",
-                    Password = "password",
-                    City = "coventry",
-                    Points = "0",
-                    Team = "None"
-                };
+                // User usering = new User
+               // {
+                //    FirstName = "John",
+                //    LastName = "Doe",
+                //    DOB = "02/02/2002",
+                //    Posistion = "Observer",
+                //    Address = "123 milll lane",
+                //    PostCode = "CV1 2KS",
+                //    Email = "john@random.com",
+                ///    PhoneNumber = "123456789",
+                //    MobilePhoneNumber = "98745612332",
+                //    Password = "password",
+                //    City = "coventry",
+               //     Points = "0",
+               //     Team = "None"
+               // };
 
-                var url2 = await CreateProductAsync(usering);
-                Console.WriteLine($"Created at {url}");
+               // var url2 = await CreateProductAsync(usering);
+               // Console.WriteLine($"Created at {url}");
 
-                List<User> users = await GetProductAsync(url);
-                foreach (User user in users)
-                {
-                    Console.WriteLine(user.FirstName);
-                    string test = Crypto.Decrypt(user.FirstName, passPhrase);
-                    Console.WriteLine(test);
-                }
+               // List<User> users = await GetProductAsync(url);
+               // foreach (User user in users)
+               // {
+                    //Console.WriteLine(user.FirstName);
+                    //string test = Crypto.Decrypt(user.FirstName, passPhrase);
+                    //Console.WriteLine(test);
+                //}
 
                 //ShowProduct(user);
 
