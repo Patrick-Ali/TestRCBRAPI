@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.IO;
 using System.Collections.Generic;
 
 
@@ -100,6 +101,28 @@ namespace HttpClientSample
             return response.StatusCode;
         }
 
+        static async Task<Uri> CreateEventAsync(EventIn eventIn) {
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/event", eventIn);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            return response.Headers.Location;
+        }
+
+        static async Task<EventIn> GetEventAsync(string path)
+        {
+            EventIn product = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                product = await response.Content.ReadAsAsync<EventIn>();
+            }
+            return product;
+        }
+
+
+
         static void Main()
         {
             RunAsync().GetAwaiter().GetResult();
@@ -115,6 +138,32 @@ namespace HttpClientSample
 
             try
             {
+                FileStream stream = File.OpenRead(@"C:\Users\patri\Downloads\M32COM_CW.pdf");
+                byte[] fileBytes = new byte[stream.Length];
+                stream.Read(fileBytes, 0, fileBytes.Length);
+
+                EventIn temp = new EventIn() {
+                    VideoURL = null,
+                    Name = "Test",
+                    Location = "London",
+                    Date = "29/02/2020",
+                    TimeStart = "09:00",
+                    TimeEnd = "18:00",
+                    EventFile = fileBytes
+                };
+
+                var uri = await CreateEventAsync(temp);
+                Console.WriteLine(uri);
+                stream.Close();
+                EventIn tempEvent = await GetEventAsync(uri.ToString());
+                Console.WriteLine(tempEvent.Location);
+                using (var filestream = File.Create(@"C:\Users\patri\Downloads\Test14.pdf"))
+                {
+                    //stream.Seek(0, SeekOrigin.Begin);
+                    //stream.CopyTo(filestream);
+                    filestream.Write(tempEvent.EventFile, 0, tempEvent.EventFile.Length);
+                    filestream.Close();
+                }
                 // Create a new product
                 //Product product = new Product
                 //{
@@ -125,19 +174,19 @@ namespace HttpClientSample
 
                 //var url = await CreateProductAsync(product);
                 //Console.WriteLine($"Created at {url}");
-                var url = "https://localhost:44389/api/1.0/user";
-                Login login = new Login()
-                {
-                    Email = "john@random.com",
-                    Password = "password"
-                };
-                var res = await Login(login);
-                Console.WriteLine(res.Email);
+                //var url = "https://localhost:44389/api/1.0/user";
+                //Login login = new Login()
+                //{
+                //Email = "john@random.com",
+                //Password = "password"
+                //};
+                //var res = await Login(login);
+                //Console.WriteLine(res.Email);
                 // Get the product
                 //url.PathAndQuery
-                
+
                 // User usering = new User
-               // {
+                // {
                 //    FirstName = "John",
                 //    LastName = "Doe",
                 //    DOB = "02/02/2002",
@@ -149,19 +198,19 @@ namespace HttpClientSample
                 //    MobilePhoneNumber = "98745612332",
                 //    Password = "password",
                 //    City = "coventry",
-               //     Points = "0",
-               //     Team = "None"
-               // };
+                //     Points = "0",
+                //     Team = "None"
+                // };
 
-               // var url2 = await CreateProductAsync(usering);
-               // Console.WriteLine($"Created at {url}");
+                // var url2 = await CreateProductAsync(usering);
+                // Console.WriteLine($"Created at {url}");
 
-               // List<User> users = await GetProductAsync(url);
-               // foreach (User user in users)
-               // {
-                    //Console.WriteLine(user.FirstName);
-                    //string test = Crypto.Decrypt(user.FirstName, passPhrase);
-                    //Console.WriteLine(test);
+                // List<User> users = await GetProductAsync(url);
+                // foreach (User user in users)
+                // {
+                //Console.WriteLine(user.FirstName);
+                //string test = Crypto.Decrypt(user.FirstName, passPhrase);
+                //Console.WriteLine(test);
                 //}
 
                 //ShowProduct(user);

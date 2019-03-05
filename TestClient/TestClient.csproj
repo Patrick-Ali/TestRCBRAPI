@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crypto.cs" />
+    <Compile Include="EventIn.cs" />
     <Compile Include="Login.cs" />
     <Compile Include="OutLogin.cs" />
     <Compile Include="Program.cs" />
