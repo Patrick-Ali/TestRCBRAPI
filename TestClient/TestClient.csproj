@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Boat.cs" />
     <Compile Include="Crypto.cs" />
+    <Compile Include="Event.cs" />
     <Compile Include="EventIn.cs" />
     <Compile Include="EventReg.cs" />
     <Compile Include="Login.cs" />

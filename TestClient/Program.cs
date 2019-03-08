@@ -190,6 +190,8 @@ namespace HttpClientSample
                 Date = rand3.ToString() + "/" + rand4.ToString() + "/" + rand5.ToString(),
                 TimeStart = "09:00",
                 TimeEnd = "18:00",
+                Description = "A fun day out to try your teams skill against other like" +
+                "minded people.",
                 EventFile = fileBytes
             };
 
@@ -322,13 +324,15 @@ namespace HttpClientSample
             return eventIn;
         }
 
-        static async Task<List<EventIn>> GetEventsAsync(string path)
+
+
+        static async Task<List<Event>> GetEventsAsync(string path)
         {
-            List<EventIn> events = null;
+            List<Event> events = null;
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode)
             {
-                events = await response.Content.ReadAsAsync<List<EventIn>>();
+                events = await response.Content.ReadAsAsync<List<Event>>();
             }
             return events;
         }
@@ -576,10 +580,10 @@ namespace HttpClientSample
                 List<EventIn> events = new List<EventIn>();
                 List<EventReg> eventRegs = new List<EventReg>();
 
-                for (int i = 0; i <= 100; i++) {
+                /*for (int i = 0; i <= 10; i++) {
                     User user = GenerateUser();
                     Console.WriteLine(i);
-                    if (i <= 50)
+                    if (i <= 5)
                     {
                         user.Posistion = "Captain";
                     }
@@ -618,8 +622,8 @@ namespace HttpClientSample
                     teams.Add(tempTeam);
                     count++;
                 }
-
-                for (int i = 0; i <= 100; i++)
+                
+                for (int i = 0; i <= 10; i++)
                 {
                     //Simulating Upload of file, can change file opean read to any pdf
                     FileStream stream = File.OpenRead(@"C:\Users\patri\Downloads\TestEventDocument.pdf");
@@ -632,6 +636,7 @@ namespace HttpClientSample
                     EventIn tempEvent = await GetEventAsync(uri.ToString());
                     events.Add(tempEvent);
                 }
+                
                 count = 0;
                 while (count < teams.Count && count < events.Count)
                 {
@@ -641,7 +646,13 @@ namespace HttpClientSample
                     eventRegs.Add(tempReg);
                     count++;
                 }
+                */
 
+                List<User> temp1 = await GetUsersAsync("https://localhost:44389/api/1.0/user");
+                List<Boat> temp2 = await GetBoatsAsync("https://localhost:44389/api/1.0/boat");
+                List<Team> temp3 = await GetTeamsAsync("https://localhost:44389/api/1.0/team");
+                List<Event> temp4 = await GetEventsAsync("https://localhost:44389/api/1.0/event");
+                List<EventReg> temp5 = await GetEventRegsAsync("https://localhost:44389/api/1.0/eventReg");
             }
             catch (Exception e)
             {

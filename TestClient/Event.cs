@@ -6,27 +6,21 @@ using System.Threading.Tasks;
 
 namespace HttpClientSample
 {
-    class EventIn
-    { 
-        public string Id { get; set; }
+    class Event
+    {
+        public string Id;
 
         public string VideoURL { get; set; }
 
-
-        public byte[] EventFile { get; set; }
-
+        public string EventFileID { get; set; }
 
         public string Name { get; set; }
 
-
         public string Date { get; set; }
-
 
         public string Location { get; set; }
 
-
         public string TimeStart { get; set; }
-
 
         public string TimeEnd { get; set; }
 
