@@ -51,12 +51,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Boat.cs" />
     <Compile Include="Crypto.cs" />
     <Compile Include="EventIn.cs" />
+    <Compile Include="EventReg.cs" />
     <Compile Include="Login.cs" />
     <Compile Include="OutLogin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Team.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>

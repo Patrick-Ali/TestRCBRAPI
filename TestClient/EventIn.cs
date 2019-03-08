@@ -29,5 +29,7 @@ namespace HttpClientSample
 
 
         public string TimeEnd { get; set; }
+
+        public string Description { get; set; }
     }
 }

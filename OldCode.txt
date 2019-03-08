@@ -1,0 +1,85 @@
+                //EventIn temp = new EventIn() {
+                   // VideoURL = null,
+                   // Name = "Test",
+                    //Location = "London",
+                    //Date = "29/02/2020",
+                    //TimeStart = "09:00",
+                    //TimeEnd = "18:00",
+                    //EventFile = fileBytes
+               // };
+
+                // Create a new product
+                //Product product = new Product
+                //{
+                //Name = "Gizmo",
+                //Price = 100,
+                //  Category = "Widgets"
+                //};
+
+                //var url = await CreateProductAsync(product);
+                //Console.WriteLine($"Created at {url}");
+                //var url = "https://localhost:44389/api/1.0/user";
+                //Login login = new Login()
+                //{
+                //Email = "john@random.com",
+                //Password = "password"
+                //};
+                //var res = await Login(login);
+                //Console.WriteLine(res.Email);
+                // Get the product
+                //url.PathAndQuery
+
+                // User usering = new User
+                // {
+                //    FirstName = "John",
+                //    LastName = "Doe",
+                //    DOB = "02/02/2002",
+                //    Posistion = "Observer",
+                //    Address = "123 milll lane",
+                //    PostCode = "CV1 2KS",
+                //    Email = "john@random.com",
+                ///    PhoneNumber = "123456789",
+                //    MobilePhoneNumber = "98745612332",
+                //    Password = "password",
+                //    City = "coventry",
+                //     Points = "0",
+                //     Team = "None"
+                // };
+
+                // var url2 = await CreateProductAsync(usering);
+                // Console.WriteLine($"Created at {url}");
+
+                // List<User> users = await GetProductAsync(url);
+                // foreach (User user in users)
+                // {
+                //Console.WriteLine(user.FirstName);
+                //string test = Crypto.Decrypt(user.FirstName, passPhrase);
+                //Console.WriteLine(test);
+                //}
+
+                //ShowProduct(user);
+
+                // Update the product
+                //Console.WriteLine("Updating price...");
+                //product.Price = 80;
+                //await UpdateProductAsync(product);
+
+                // Get the updated product
+                // product = await GetProductAsync(url.PathAndQuery);
+                //ShowProduct(product);
+
+                // Delete the product
+                // var statusCode = await DeleteProductAsync(product.Id);
+                // Console.WriteLine($"Deleted (HTTP Status = {(int)statusCode})");
+
+				                //Simualte downloading the file
+                EventIn tempEvent = await GetEventAsync(uri.ToString());
+                Console.WriteLine(tempEvent.Location);
+                using (var filestream = File.Create(@"C:\Users\patri\Downloads\Test20.pdf"))
+                {
+                    //tempEvent.EventFile.CopyTo()
+                    //stream.Seek(0, SeekOrigin.Begin);
+                    //stream.CopyTo(filestream);
+                    filestream.Write(tempEvent.EventFile, 0, tempEvent.EventFile.Length);
+                    filestream.Close();
+                }

@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -20,7 +21,186 @@ namespace HttpClientSample
                 //$"{product.Price}\tCategory: {product.Category}");
         }
 
-        static async Task<Uri> CreateProductAsync(User user)
+        //--------------Create Objects--------------
+
+        static User GenerateUser()
+        {
+            List<string> names = new List<string>()
+            {
+                "Andrew",
+                "Bob",
+                "Charels",
+                "Dug",
+                "Even",
+                "Fred",
+                "George",
+                "Harry",
+                "Ian",
+                "Jo",
+                "Kevin",
+                "Luke",
+                "Matt"
+            };
+            List<string> lastNames = new List<string>()
+            {
+                "Nolan",
+                "Oliver",
+                "Peter",
+                "Quin",
+                "Roger",
+                "Steven",
+                "Trevor",
+                "Ulysses",
+                "Victor",
+                "William",
+                "Xerxes",
+                "Yvon",
+                "Zach"
+            };
+            List<string> posistion = new List<string>()
+            {
+                "Captain",
+                "Pit"
+            };
+
+            Random random = new Random();
+            int rand1 = random.Next(0, 12);
+            int rand2 = random.Next(0, 12);
+            int rand3 = random.Next(1, 31);
+            int rand4 = random.Next(1, 12);
+            int rand5 = random.Next(1940, 2001);
+            int rand6 = random.Next(0, 2);
+            int rand7 = random.Next(0, 12);
+            int rand8 = random.Next(1, 100);
+            int rand9 = random.Next(1, 20);
+            int rand10 = random.Next(1, 20);
+            StringBuilder builder = new StringBuilder();
+            builder.Append(RandomString(4, true));
+            builder.Append(random.Next(1000, 9999));
+            builder.Append(RandomString(2, false));
+            if (rand3 > 28 && rand4 == 2)
+            {
+                rand3 = 28;
+            }
+            if (rand3 > 30 && rand4 == 4 || rand4 == 6 || rand4 == 9 || rand4 == 11)
+            {
+                rand3 = 30;
+            }
+            User usering = new User
+            {
+                FirstName = names[rand1],
+                LastName = lastNames[rand2],
+                DOB = rand3.ToString() + "/" + rand4.ToString() + "/" + rand5.ToString(),
+                Posistion = posistion[rand6],
+                Address = rand8.ToString() + " " + lastNames[rand7] + " street",
+                PostCode = "CV" + rand9.ToString() + " " + rand10.ToString() + "KS",
+                Email = names[rand1] + "@random.com",
+                PhoneNumber = "123456789",
+                MobilePhoneNumber = "98745612332",
+                Password = builder.ToString(),
+                City = "Coventry",
+                Points = random.Next(0, 200).ToString(),
+                Team = "None"
+            };
+            return usering;
+        }
+
+        public static Boat GetBoat(string captain)
+        {
+
+            Boat boat = new Boat()
+            {
+                Beam = "17.3",
+
+                Type = "Catamaran",
+
+                DriveSystem = "Flex shaft",
+
+                HullHeight = "9.5",
+
+                HullMaterial = "Fiberglass",
+
+                Length = "48",
+
+                MotorSize = "6-pole 1000Kv 56×87mm",
+
+                PropellerSize = "1.4×1.90 and 1.4×2.0",
+
+                Radio = "Spektrum DX2E",
+
+                Scale = "48-inch",
+
+                Speed = "55+ mph with 8S Li-Po",
+
+                SpeedControl = "Dynamite 160A HV 2S-8S",
+
+                Steering = "In-line rudder with break away",
+
+                Coluors = "Orange, Gray, White",
+
+                Weight = "2.5",
+
+                CaptainID = captain
+            };
+
+            return boat;
+        }
+
+        public static Team GetTeam(string captain, string pit, string recruiting)
+        {
+            Team team = new Team()
+            {
+                CaptainID = captain,
+                PitID = pit,
+                Recruiting = recruiting
+            };
+            return team;
+        }
+
+        public static EventReg GetEventReg(string team, string eventIn)
+        {
+            EventReg eventReg = new EventReg()
+            {
+                EventID = eventIn,
+                TeamID = team
+            };
+            return eventReg;
+        }
+
+        public static EventIn GetEvent(byte[] fileBytes)
+        {
+            Random random = new Random();
+            int rand3 = random.Next(1, 31);
+            int rand4 = random.Next(1, 12);
+            int rand5 = random.Next(2019, 2020);
+            if (rand3 > 28 && rand4 == 2)
+            {
+                rand3 = 28;
+            }
+            if (rand3 > 30 && rand4 == 4 || rand4 == 6 || rand4 == 9 || rand4 == 11)
+            {
+                rand3 = 30;
+            }
+
+            EventIn eventIn = new EventIn()
+            {
+                VideoURL = null,
+                Name = "Test",
+                Location = "Lake District",
+                Date = rand3.ToString() + "/" + rand4.ToString() + "/" + rand5.ToString(),
+                TimeStart = "09:00",
+                TimeEnd = "18:00",
+                EventFile = fileBytes
+            };
+
+            return eventIn;
+        }
+
+        //--------------End Create Objects--------------
+
+        //--------------User Access Methods--------------
+
+        static async Task<Uri> CreateUserAsync(User user)
         {
             User crypto = new User();
             crypto.Address = Crypto.Encrypt(user.Address, passPhrase);
@@ -46,44 +226,29 @@ namespace HttpClientSample
             return response.Headers.Location;
         }
 
-        static async Task<OutLogin> Login(Login login)
+        static async Task<List<User>> GetUsersAsync(string path)
         {
-            string sendEmail = Crypto.Encrypt(login.Email, passPhrase);
-            string sendPassword = Crypto.Encrypt(login.Password, passPhrase);
-            Login logSend = new Login() {
-                Email = sendEmail,
-                Password = sendPassword
-            };
-
-            HttpResponseMessage response = await client.PostAsJsonAsync(
-                "https://localhost:44389/api/1.0/login", logSend);
-            response.EnsureSuccessStatusCode();
-            var tempURL = response.Headers.Location;
-            Console.WriteLine(tempURL);
-            User tempUser = await GetProductAsync(tempURL.ToString());
-            string id = tempUser.Id;
-            string email = Crypto.Decrypt(tempUser.Email, passPhrase);
-            OutLogin final = new OutLogin() {
-                Email = email,
-                Id = id
-            };
-            return final;
-            //OutLogin temp = response.Content.ReadAsAsync<OutLogin>();
-
-        }
-
-        static async Task<User> GetProductAsync(string path)
-        {
-            User product = null;
+            List<User> users = null;
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode)
             {
-                product = await response.Content.ReadAsAsync<User>();
+                users = await response.Content.ReadAsAsync<List<User>>();
             }
-            return product;
+            return users;
         }
 
-        static async Task<User> UpdateProductAsync(User user)
+        static async Task<User> GetUserAsync(string path)
+        {
+            User user = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                user = await response.Content.ReadAsAsync<User>();
+            }
+            return user;
+        }
+
+        static async Task<User> UpdateUserAsync(User user)
         {
             HttpResponseMessage response = await client.PutAsJsonAsync(
                 $"https://localhost:44389/api/1.0/user/{ user.Id}", user);
@@ -94,12 +259,48 @@ namespace HttpClientSample
             return user;
         }
 
-        static async Task<HttpStatusCode> DeleteProductAsync(string id)
+        static async Task<HttpStatusCode> DeleteUserAsync(string id)
         {
             HttpResponseMessage response = await client.DeleteAsync(
                 $"https://localhost:44389/api/1.0/user/{id}");
             return response.StatusCode;
         }
+
+        //--------------End User Access Methods--------------
+
+        //--------------Login Access Methods--------------
+
+        static async Task<OutLogin> Login(Login login)
+        {
+            string sendEmail = Crypto.Encrypt(login.Email, passPhrase);
+            string sendPassword = Crypto.Encrypt(login.Password, passPhrase);
+            Login logSend = new Login()
+            {
+                Email = sendEmail,
+                Password = sendPassword
+            };
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/login", logSend);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            User tempUser = await GetUserAsync(tempURL.ToString());
+            string id = tempUser.Id;
+            string email = Crypto.Decrypt(tempUser.Email, passPhrase);
+            OutLogin final = new OutLogin()
+            {
+                Email = email,
+                Id = id
+            };
+            return final;
+            //OutLogin temp = response.Content.ReadAsAsync<OutLogin>();
+
+        }
+
+        //--------------End Login Access Methods--------------
+
+       //--------------Event Access Methods--------------
 
         static async Task<Uri> CreateEventAsync(EventIn eventIn) {
             HttpResponseMessage response = await client.PostAsJsonAsync(
@@ -112,15 +313,241 @@ namespace HttpClientSample
 
         static async Task<EventIn> GetEventAsync(string path)
         {
-            EventIn product = null;
+            EventIn eventIn = null;
             HttpResponseMessage response = await client.GetAsync(path);
             if (response.IsSuccessStatusCode)
             {
-                product = await response.Content.ReadAsAsync<EventIn>();
+                eventIn = await response.Content.ReadAsAsync<EventIn>();
             }
-            return product;
+            return eventIn;
         }
 
+        static async Task<List<EventIn>> GetEventsAsync(string path)
+        {
+            List<EventIn> events = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                events = await response.Content.ReadAsAsync<List<EventIn>>();
+            }
+            return events;
+        }
+
+        static async Task<EventIn> UpdateEventAsync(EventIn eventIn)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                $"https://localhost:44389/api/1.0/event/{ eventIn.Id}", eventIn);
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the updated product from the response body.
+            eventIn = await response.Content.ReadAsAsync<EventIn>();
+            return eventIn;
+        }
+
+        static async Task<HttpStatusCode> DeleteEventAsync(string id)
+        {
+            HttpResponseMessage response = await client.DeleteAsync(
+                $"https://localhost:44389/api/1.0/event/{id}");
+            return response.StatusCode;
+        }
+
+        //--------------End Event Access Methods--------------
+
+        //--------------Team Access Methods--------------
+
+        static async Task<Uri> CreateTeamAsync(Team team)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/team", team);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            return response.Headers.Location;
+        }
+
+        static async Task<Team> GetTeamAsync(string path)
+        {
+            Team team = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                team = await response.Content.ReadAsAsync<Team>();
+            }
+            return team;
+        }
+
+        static async Task<List<Team>> GetTeamsAsync(string path)
+        {
+            List<Team> teams = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                teams = await response.Content.ReadAsAsync<List<Team>>();
+            }
+            return teams;
+        }
+
+        static async Task<Team> UpdateTeamAsync(Team team)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                $"https://localhost:44389/api/1.0/team/{ team.Id}", team);
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the updated product from the response body.
+            team = await response.Content.ReadAsAsync<Team>();
+            return team;
+        }
+
+        static async Task<HttpStatusCode> DeleteTeamAsync(string id)
+        {
+            HttpResponseMessage response = await client.DeleteAsync(
+                $"https://localhost:44389/api/1.0/team/{id}");
+            return response.StatusCode;
+        }
+
+        //--------------End Team Access Methods--------------
+
+        //--------------Boat Access Methods--------------
+
+        static async Task<Uri> CreateBoatAsync(Boat boat)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/boat", boat);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            return response.Headers.Location;
+        }
+
+        static async Task<Boat> GetBoatAsync(string path)
+        {
+            Boat boat = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                boat = await response.Content.ReadAsAsync<Boat>();
+            }
+            return boat;
+        }
+
+        static async Task<List<Boat>> GetBoatsAsync(string path)
+        {
+            List<Boat> boat = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                boat = await response.Content.ReadAsAsync<List<Boat>>();
+            }
+            return boat;
+        }
+
+        static async Task<Boat> UpdateBoatAsync(Boat boat)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                $"https://localhost:44389/api/1.0/boat/{ boat.Id}", boat);
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the updated product from the response body.
+            boat = await response.Content.ReadAsAsync<Boat>();
+            return boat;
+        }
+
+        static async Task<HttpStatusCode> DeleteBoatAsync(string id)
+        {
+            HttpResponseMessage response = await client.DeleteAsync(
+                $"https://localhost:44389/api/1.0/boat/{id}");
+            return response.StatusCode;
+        }
+
+        //--------------End Boat Access Methods--------------
+
+        //--------------EventReg Access Methods--------------
+
+        static async Task<Uri> CreateEventRegAsync(EventReg eventReg)
+        {
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/eventReg", eventReg);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            Console.WriteLine(tempURL);
+            return response.Headers.Location;
+        }
+
+        static async Task<EventReg> GetEventRegAsync(string path)
+        {
+            EventReg eventReg = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                eventReg = await response.Content.ReadAsAsync<EventReg>();
+            }
+            return eventReg;
+        }
+
+        static async Task<List<EventReg>> GetEventRegsAsync(string path)
+        {
+            List<EventReg> eventReg = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                eventReg = await response.Content.ReadAsAsync<List<EventReg>>();
+            }
+            return eventReg;
+        }
+
+        static async Task<EventReg> UpdateEventRegAsync(EventReg eventReg)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                $"https://localhost:44389/api/1.0/eventReg/{ eventReg.Id}", eventReg);
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the updated product from the response body.
+            eventReg = await response.Content.ReadAsAsync<EventReg>();
+            return eventReg;
+        }
+
+        static async Task<HttpStatusCode> DeleteEventRegAsync(string id)
+        {
+            HttpResponseMessage response = await client.DeleteAsync(
+                $"https://localhost:44389/api/1.0/eventReg/{id}");
+            return response.StatusCode;
+        }
+
+        //--------------End EventReg Access Methods--------------
+
+        //--------------Helper Methods--------------
+
+        // Taken from https://www.c-sharpcorner.com/article/generating-random-number-and-string-in-C-Sharp/
+
+        public static string RandomString(int size, bool lowerCase)
+        {
+            StringBuilder builder = new StringBuilder();
+            Random random = new Random();
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(Math.Floor(26 * random.NextDouble() + 65)));
+                builder.Append(ch);
+            }
+            if (lowerCase)
+                return builder.ToString().ToLower();
+            return builder.ToString();
+        }
+
+        public static async Task<bool> SimulateDownloadingFile(Uri uri) {
+            //Simualte downloading the file, can change file create to 
+            //wherever and whatever pdf to be created
+            EventIn tempEvent = await GetEventAsync(uri.ToString());
+            Console.WriteLine(tempEvent.Location);
+            using (var filestream = File.Create(@"C:\Users\patri\Downloads\Test20.pdf"))
+            {
+                filestream.Write(tempEvent.EventFile, 0, tempEvent.EventFile.Length);
+                filestream.Close();
+                return true;
+            }
+        }
+
+        //--------------End Helper Methods--------------
 
 
         static void Main()
@@ -138,95 +565,82 @@ namespace HttpClientSample
 
             try
             {
-                FileStream stream = File.OpenRead(@"C:\Users\patri\Downloads\M32COM_CW.pdf");
-                byte[] fileBytes = new byte[stream.Length];
-                stream.Read(fileBytes, 0, fileBytes.Length);
+                //Simulating creating the user
+                //User user = GenerateUser();
 
-                EventIn temp = new EventIn() {
-                    VideoURL = null,
-                    Name = "Test",
-                    Location = "London",
-                    Date = "29/02/2020",
-                    TimeStart = "09:00",
-                    TimeEnd = "18:00",
-                    EventFile = fileBytes
-                };
 
-                var uri = await CreateEventAsync(temp);
-                Console.WriteLine(uri);
-                stream.Close();
-                EventIn tempEvent = await GetEventAsync(uri.ToString());
-                Console.WriteLine(tempEvent.Location);
-                using (var filestream = File.Create(@"C:\Users\patri\Downloads\Test14.pdf"))
-                {
-                    //stream.Seek(0, SeekOrigin.Begin);
-                    //stream.CopyTo(filestream);
-                    filestream.Write(tempEvent.EventFile, 0, tempEvent.EventFile.Length);
-                    filestream.Close();
+                List<User> captains = new List<User>();
+                List<User> pit = new List<User>();
+                List<Boat> boats = new List<Boat>();
+                List<Team> teams = new List<Team>();
+                List<EventIn> events = new List<EventIn>();
+                List<EventReg> eventRegs = new List<EventReg>();
+
+                for (int i = 0; i <= 100; i++) {
+                    User user = GenerateUser();
+                    Console.WriteLine(i);
+                    if (i <= 50)
+                    {
+                        user.Posistion = "Captain";
+                    }
+                    else {
+                        user.Posistion = "Pit";
+                    }
+                    //Console.WriteLine(user.FirstName + " " + user.LastName
+                       // + " " + user.DOB + " " + user.Email + " " + user.Address + " " + user.Password
+                       // + " " + user.Posistion);
+                    if (user.Posistion == "Captain")
+                    {
+                        var uriTemp = await CreateUserAsync(user);
+                        Console.WriteLine("User Captain: " + uriTemp);
+                        User userTemp = await GetUserAsync(uriTemp.ToString());
+                        Boat tempBoat = GetBoat(userTemp.Id);
+                        var uriTempBoat = await CreateBoatAsync(tempBoat);
+                        Console.WriteLine("Boat: " + uriTempBoat);
+                        Boat addBoat = await GetBoatAsync(uriTempBoat.ToString());
+                        captains.Add(userTemp);
+                    }
+                    if (user.Posistion == "Pit")
+                    {
+                        Console.WriteLine("Hello");
+                        var uriTemp = await CreateUserAsync(user);
+                        Console.WriteLine("User Pit: " + uriTemp);
+                        User userTemp = await GetUserAsync(uriTemp.ToString());
+                        pit.Add(userTemp);
+                    }
                 }
-                // Create a new product
-                //Product product = new Product
-                //{
-                //Name = "Gizmo",
-                //Price = 100,
-                //  Category = "Widgets"
-                //};
 
-                //var url = await CreateProductAsync(product);
-                //Console.WriteLine($"Created at {url}");
-                //var url = "https://localhost:44389/api/1.0/user";
-                //Login login = new Login()
-                //{
-                //Email = "john@random.com",
-                //Password = "password"
-                //};
-                //var res = await Login(login);
-                //Console.WriteLine(res.Email);
-                // Get the product
-                //url.PathAndQuery
+                int count = 0;
+                while (count < captains.Count && count < pit.Count) {
+                    Team team = GetTeam(captains[count].Id, pit[count].Id, "false");
+                    var uriTemp = await CreateTeamAsync(team);
+                    Team tempTeam = await GetTeamAsync(uriTemp.ToString());
+                    teams.Add(tempTeam);
+                    count++;
+                }
 
-                // User usering = new User
-                // {
-                //    FirstName = "John",
-                //    LastName = "Doe",
-                //    DOB = "02/02/2002",
-                //    Posistion = "Observer",
-                //    Address = "123 milll lane",
-                //    PostCode = "CV1 2KS",
-                //    Email = "john@random.com",
-                ///    PhoneNumber = "123456789",
-                //    MobilePhoneNumber = "98745612332",
-                //    Password = "password",
-                //    City = "coventry",
-                //     Points = "0",
-                //     Team = "None"
-                // };
-
-                // var url2 = await CreateProductAsync(usering);
-                // Console.WriteLine($"Created at {url}");
-
-                // List<User> users = await GetProductAsync(url);
-                // foreach (User user in users)
-                // {
-                //Console.WriteLine(user.FirstName);
-                //string test = Crypto.Decrypt(user.FirstName, passPhrase);
-                //Console.WriteLine(test);
-                //}
-
-                //ShowProduct(user);
-
-                // Update the product
-                //Console.WriteLine("Updating price...");
-                //product.Price = 80;
-                //await UpdateProductAsync(product);
-
-                // Get the updated product
-                // product = await GetProductAsync(url.PathAndQuery);
-                //ShowProduct(product);
-
-                // Delete the product
-                // var statusCode = await DeleteProductAsync(product.Id);
-                // Console.WriteLine($"Deleted (HTTP Status = {(int)statusCode})");
+                for (int i = 0; i <= 100; i++)
+                {
+                    //Simulating Upload of file, can change file opean read to any pdf
+                    FileStream stream = File.OpenRead(@"C:\Users\patri\Downloads\TestEventDocument.pdf");
+                    byte[] fileBytes = new byte[stream.Length];
+                    stream.Read(fileBytes, 0, fileBytes.Length);
+                    EventIn temp = GetEvent(fileBytes);
+                    var uri = await CreateEventAsync(temp);
+                    //Console.WriteLine(uri);
+                    stream.Close();
+                    EventIn tempEvent = await GetEventAsync(uri.ToString());
+                    events.Add(tempEvent);
+                }
+                count = 0;
+                while (count < teams.Count && count < events.Count)
+                {
+                    EventReg eventReg = GetEventReg(teams[count].Id, events[count].Id);
+                    var uriEventReg = await CreateEventRegAsync(eventReg);
+                    EventReg tempReg = await GetEventRegAsync(uriEventReg.ToString());
+                    eventRegs.Add(tempReg);
+                    count++;
+                }
 
             }
             catch (Exception e)
