@@ -270,6 +270,68 @@ namespace HttpClientSample
 
         //--------------End User Access Methods--------------
 
+        //--------------Admin Access Methods--------------
+
+        static async Task<Uri> CreateAdminAsync(Admin admin)
+        {
+            Admin crypto = new Admin();
+
+            crypto.Email = Crypto.Encrypt(admin.Email, passPhrase);
+
+            crypto.Password = Crypto.Encrypt(admin.Password, passPhrase);
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/admin", crypto);
+
+            response.EnsureSuccessStatusCode();
+
+            // return URI of the created resource.
+
+            return response.Headers.Location;
+        }
+
+        static async Task<List<Admin>> GetAdminsAsync(string path)
+        {
+            List<Admin> admins = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                admins = await response.Content.ReadAsAsync<List<Admin>>();
+            }
+            return admins;
+        }
+
+        static async Task<Admin> GetAdminAsync(string path)
+        {
+            Admin admin = null;
+            HttpResponseMessage response = await client.GetAsync(path);
+            if (response.IsSuccessStatusCode)
+            {
+                admin = await response.Content.ReadAsAsync<Admin>();
+            }
+            return admin;
+        }
+
+        static async Task<Admin> UpdateAdminAsync(Admin admin)
+        {
+            HttpResponseMessage response = await client.PutAsJsonAsync(
+                $"https://localhost:44389/api/1.0/admin/{ admin.Id}", admin);
+            response.EnsureSuccessStatusCode();
+
+            // Deserialize the updated product from the response body.
+            admin = await response.Content.ReadAsAsync<Admin>();
+            return admin;
+        }
+
+        static async Task<HttpStatusCode> DeleteAdminAsync(string id)
+        {
+            HttpResponseMessage response = await client.DeleteAsync(
+                $"https://localhost:44389/api/1.0/admin/{id}");
+            return response.StatusCode;
+        }
+
+        //--------------End Admin Access Methods--------------
+
         //--------------Login Access Methods--------------
 
         static async Task<OutLogin> Login(Login login)
@@ -302,7 +364,41 @@ namespace HttpClientSample
 
         //--------------End Login Access Methods--------------
 
-       //--------------Event Access Methods--------------
+        //--------------Admin Login Access Methods--------------
+
+        static async Task<OutLogin> AdminLogin(Login login)
+        {
+            string sendEmail = Crypto.Encrypt(login.Email, passPhrase);
+            string sendPassword = Crypto.Encrypt(login.Password, passPhrase);
+            Login logSend = new Login()
+            {
+                Email = sendEmail,
+                Password = sendPassword
+            };
+
+            HttpResponseMessage response = await client.PostAsJsonAsync(
+                "https://localhost:44389/api/1.0/adminlogin", logSend);
+            Console.Write(response.IsSuccessStatusCode);
+            response.EnsureSuccessStatusCode();
+            var tempURL = response.Headers.Location;
+            
+            Console.WriteLine(tempURL);
+            Admin tempAdmin = await GetAdminAsync(tempURL.ToString());
+            string id = tempAdmin.Id;
+            string email = Crypto.Decrypt(tempAdmin.Email, passPhrase);
+            OutLogin final = new OutLogin()
+            {
+                Email = email,
+                Id = id
+            };
+            return final;
+            //OutLogin temp = response.Content.ReadAsAsync<OutLogin>();
+
+        }
+
+        //--------------End Admin Login Access Methods--------------
+
+        //--------------Event Access Methods--------------
 
         static async Task<Uri> CreateEventAsync(EventIn eventIn) {
             HttpResponseMessage response = await client.PostAsJsonAsync(
@@ -572,15 +668,34 @@ namespace HttpClientSample
                 //Simulating creating the user
                 //User user = GenerateUser();
 
+                Admin admin = new Admin()
+                {
+                    Email = "admin2@random.com",
+                    Password = "password2"
+                };
 
-                List<User> captains = new List<User>();
+                /*
+                var uriTemp = await CreateAdminAsync(admin);
+                Admin adminTemp = await GetAdminAsync(uriTemp.ToString());
+                Console.WriteLine(adminTemp.Email + " " + adminTemp.Password + " " + adminTemp.Id);
+                */
+
+                Login tempLogin = new Login();
+                tempLogin.Email = admin.Email;
+                tempLogin.Password = admin.Password;
+                
+                OutLogin tempAdmin = await AdminLogin(tempLogin);
+                Console.WriteLine(tempAdmin.Email + " " + tempAdmin.Id);
+
+
+                /*List<User> captains = new List<User>();
                 List<User> pit = new List<User>();
                 List<Boat> boats = new List<Boat>();
                 List<Team> teams = new List<Team>();
                 List<EventIn> events = new List<EventIn>();
                 List<EventReg> eventRegs = new List<EventReg>();
 
-                /*for (int i = 0; i <= 10; i++) {
+                for (int i = 0; i <= 10; i++) {
                     User user = GenerateUser();
                     Console.WriteLine(i);
                     if (i <= 5)
@@ -646,13 +761,14 @@ namespace HttpClientSample
                     eventRegs.Add(tempReg);
                     count++;
                 }
-                */
+                
 
                 List<User> temp1 = await GetUsersAsync("https://localhost:44389/api/1.0/user");
                 List<Boat> temp2 = await GetBoatsAsync("https://localhost:44389/api/1.0/boat");
                 List<Team> temp3 = await GetTeamsAsync("https://localhost:44389/api/1.0/team");
                 List<Event> temp4 = await GetEventsAsync("https://localhost:44389/api/1.0/event");
                 List<EventReg> temp5 = await GetEventRegsAsync("https://localhost:44389/api/1.0/eventReg");
+                */
             }
             catch (Exception e)
             {
