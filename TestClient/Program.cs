@@ -66,14 +66,15 @@ namespace HttpClientSample
             Random random = new Random();
             int rand1 = random.Next(0, 12);
             int rand2 = random.Next(0, 12);
-            int rand3 = random.Next(1, 31);
-            int rand4 = random.Next(1, 12);
+            int rand3 = random.Next(10, 31);
+            int rand4 = random.Next(10, 12);
             int rand5 = random.Next(1940, 2001);
             int rand6 = random.Next(0, 2);
             int rand7 = random.Next(0, 12);
             int rand8 = random.Next(1, 100);
             int rand9 = random.Next(1, 20);
             int rand10 = random.Next(1, 20);
+            int rand11 = random.Next(1, 1000);
             StringBuilder builder = new StringBuilder();
             builder.Append(RandomString(4, true));
             builder.Append(random.Next(1000, 9999));
@@ -91,16 +92,16 @@ namespace HttpClientSample
                 FirstName = names[rand1],
                 LastName = lastNames[rand2],
                 DOB = rand3.ToString() + "/" + rand4.ToString() + "/" + rand5.ToString(),
-                Posistion = posistion[rand6],
+                Posistion = "Captain",
                 Address = rand8.ToString() + " " + lastNames[rand7] + " street",
                 PostCode = "CV" + rand9.ToString() + " " + rand10.ToString() + "KS",
-                Email = names[rand1] + "@random.com",
+                Email = names[rand1] + names[rand2] + rand5.ToString() + "@random" + rand11.ToString() + ".com",
                 PhoneNumber = "123456789",
                 MobilePhoneNumber = "98745612332",
-                Password = builder.ToString(),
+                Password = "Password",//builder.ToString(),
                 City = "Coventry",
                 Points = random.Next(0, 200).ToString(),
-                Team = "None"
+                Team = "null"
             };
             return usering;
         }
@@ -110,17 +111,23 @@ namespace HttpClientSample
 
             Boat boat = new Boat()
             {
-                Beam = "17.3",
+                Beam = "17",
+
+                BeamM = "in",
 
                 Type = "Catamaran",
 
                 DriveSystem = "Flex shaft",
 
-                HullHeight = "9.5",
+                HullHeight = "9",
+
+                HullHeightM = "in",
 
                 HullMaterial = "Fiberglass",
 
                 Length = "48",
+
+                LengthM = "in",
 
                 MotorSize = "6-pole 1000Kv 56×87mm",
 
@@ -128,9 +135,13 @@ namespace HttpClientSample
 
                 Radio = "Spektrum DX2E",
 
-                Scale = "48-inch",
+                Scale = "48",
 
-                Speed = "55+ mph with 8S Li-Po",
+                ScaleM = "in",
+
+                Speed = "55",
+
+                SpeedM = "mph",
 
                 SpeedControl = "Dynamite 160A HV 2S-8S",
 
@@ -138,7 +149,9 @@ namespace HttpClientSample
 
                 Coluors = "Orange, Gray, White",
 
-                Weight = "2.5",
+                Weight = "12",
+
+                WeightM = "lb",
 
                 CaptainID = captain
             };
@@ -181,13 +194,22 @@ namespace HttpClientSample
             {
                 rand3 = 30;
             }
-
+            string tempHold = rand4.ToString();
+            if (rand4 < 10) {
+                tempHold = "0" + rand4.ToString();
+            }
+            string tempHoldDay = rand3.ToString();
+            if (rand3 < 10)
+            {
+                tempHoldDay = "0" + rand3.ToString();
+            }
             EventIn eventIn = new EventIn()
             {
-                VideoURL = null,
-                Name = "Test",
+                VideoURL = "null",
+                Name = "Trials"+tempHoldDay,
                 Location = "Lake District",
-                Date = rand3.ToString() + "/" + rand4.ToString() + "/" + rand5.ToString(),
+                //Date = tempHoldDay + "/" +  + "/" + ,
+                Date = rand5.ToString() + "-" + tempHold + "-" + tempHoldDay,
                 TimeStart = "09:00",
                 TimeEnd = "18:00",
                 Description = "A fun day out to try your teams skill against other like" +
@@ -647,6 +669,24 @@ namespace HttpClientSample
             }
         }
 
+        static User DecryptUser(User user)
+        {
+            user.Address = Crypto.Decrypt(user.Address, passPhrase);
+            user.City = Crypto.Decrypt(user.City, passPhrase);
+            user.DOB = Crypto.Decrypt(user.DOB, passPhrase);
+            user.Email = Crypto.Decrypt(user.Email, passPhrase);
+            user.FirstName = Crypto.Decrypt(user.FirstName, passPhrase);
+            user.LastName = Crypto.Decrypt(user.LastName, passPhrase);
+            user.PostCode = Crypto.Decrypt(user.PostCode, passPhrase);
+            user.Password = Crypto.Decrypt(user.Password, passPhrase);
+            user.Team = Crypto.Decrypt(user.Team, passPhrase);
+            user.Posistion = Crypto.Decrypt(user.Posistion, passPhrase);
+            user.PhoneNumber = Crypto.Decrypt(user.PhoneNumber, passPhrase);
+            user.MobilePhoneNumber = Crypto.Decrypt(user.MobilePhoneNumber, passPhrase);
+            user.Points = Crypto.Decrypt(user.Points, passPhrase);
+            return user;
+        }
+
         //--------------End Helper Methods--------------
 
 
@@ -668,11 +708,11 @@ namespace HttpClientSample
                 //Simulating creating the user
                 //User user = GenerateUser();
 
-                Admin admin = new Admin()
+                /*Admin admin = new Admin()
                 {
                     Email = "admin2@random.com",
                     Password = "password2"
-                };
+                };*/
 
                 /*
                 var uriTemp = await CreateAdminAsync(admin);
@@ -680,43 +720,57 @@ namespace HttpClientSample
                 Console.WriteLine(adminTemp.Email + " " + adminTemp.Password + " " + adminTemp.Id);
                 */
 
-                Login tempLogin = new Login();
+               /* Login tempLogin = new Login();
                 tempLogin.Email = admin.Email;
                 tempLogin.Password = admin.Password;
                 
                 OutLogin tempAdmin = await AdminLogin(tempLogin);
-                Console.WriteLine(tempAdmin.Email + " " + tempAdmin.Id);
+                Console.WriteLine(tempAdmin.Email + " " + tempAdmin.Id);*/
 
 
-                /*List<User> captains = new List<User>();
+                List<User> captains = new List<User>();
                 List<User> pit = new List<User>();
                 List<Boat> boats = new List<Boat>();
                 List<Team> teams = new List<Team>();
                 List<EventIn> events = new List<EventIn>();
                 List<EventReg> eventRegs = new List<EventReg>();
 
-                for (int i = 0; i <= 10; i++) {
+                /*for (int i = 0; i <= 100; i++) {
                     User user = GenerateUser();
                     Console.WriteLine(i);
-                    if (i <= 5)
-                    {
-                        user.Posistion = "Captain";
-                    }
-                    else {
-                        user.Posistion = "Pit";
-                    }
                     //Console.WriteLine(user.FirstName + " " + user.LastName
-                       // + " " + user.DOB + " " + user.Email + " " + user.Address + " " + user.Password
-                       // + " " + user.Posistion);
+                    // + " " + user.DOB + " " + user.Email + " " + user.Address + " " + user.Password
+                    // + " " + user.Posistion);
+                    User crypto = new User();
                     if (user.Posistion == "Captain")
                     {
                         var uriTemp = await CreateUserAsync(user);
                         Console.WriteLine("User Captain: " + uriTemp);
                         User userTemp = await GetUserAsync(uriTemp.ToString());
+                        User decUser = DecryptUser(userTemp);
                         Boat tempBoat = GetBoat(userTemp.Id);
                         var uriTempBoat = await CreateBoatAsync(tempBoat);
                         Console.WriteLine("Boat: " + uriTempBoat);
                         Boat addBoat = await GetBoatAsync(uriTempBoat.ToString());
+                        Team team = GetTeam(decUser.Id, "null", "true");
+                        var uriTemp2 = await CreateTeamAsync(team);
+                        Team tempTeam = await GetTeamAsync(uriTemp2.ToString());
+                        decUser.Team = tempTeam.Id;
+                        crypto.FirstName = Crypto.Encrypt(decUser.FirstName, passPhrase);
+                        crypto.Posistion = Crypto.Encrypt(decUser.Posistion, passPhrase);
+                        crypto.Address = Crypto.Encrypt(decUser.Address, passPhrase);
+                        crypto.City = Crypto.Encrypt(decUser.City, passPhrase);
+                        crypto.DOB = Crypto.Encrypt(decUser.DOB, passPhrase);
+                        crypto.Email = Crypto.Encrypt(decUser.Email, passPhrase);
+                        crypto.LastName = Crypto.Encrypt(decUser.LastName, passPhrase);
+                        crypto.PostCode = Crypto.Encrypt(decUser.PostCode, passPhrase);
+                        crypto.Password = Crypto.Encrypt(decUser.Password, passPhrase);
+                        crypto.Team = Crypto.Encrypt(decUser.Team, passPhrase);
+                        crypto.Points = Crypto.Encrypt(decUser.Points, passPhrase);
+                        crypto.PhoneNumber = Crypto.Encrypt(decUser.PhoneNumber, passPhrase);
+                        crypto.MobilePhoneNumber = Crypto.Encrypt(decUser.MobilePhoneNumber, passPhrase);
+                        crypto.Id = decUser.Id;
+                        await UpdateUserAsync(crypto);
                         captains.Add(userTemp);
                     }
                     if (user.Posistion == "Pit")
@@ -729,16 +783,16 @@ namespace HttpClientSample
                     }
                 }
 
-                int count = 0;
-                while (count < captains.Count && count < pit.Count) {
-                    Team team = GetTeam(captains[count].Id, pit[count].Id, "false");
+                  int count = 0;
+                while (count < captains.Count) {
+                    Team team = GetTeam(captains[count].Id, "null", "true");
                     var uriTemp = await CreateTeamAsync(team);
                     Team tempTeam = await GetTeamAsync(uriTemp.ToString());
                     teams.Add(tempTeam);
                     count++;
-                }
+                }*/
                 
-                for (int i = 0; i <= 10; i++)
+              for (int i = 0; i <= 100; i++)
                 {
                     //Simulating Upload of file, can change file opean read to any pdf
                     FileStream stream = File.OpenRead(@"C:\Users\patri\Downloads\TestEventDocument.pdf");
@@ -752,7 +806,7 @@ namespace HttpClientSample
                     events.Add(tempEvent);
                 }
                 
-                count = 0;
+                /*count = 0;
                 while (count < teams.Count && count < events.Count)
                 {
                     EventReg eventReg = GetEventReg(teams[count].Id, events[count].Id);
